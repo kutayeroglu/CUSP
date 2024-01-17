@@ -66,6 +66,8 @@ class _TFNetworkStub(dnnlib.EasyDict):
 
 class _LegacyUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
+        if module == 'torch.storage' and name == '_load_from_bytes':
+            return lambda b: torch.load(io.BytesIO(b), map_location='cpu')
         if module == 'dnnlib.tflib.network' and name == 'Network':
             return _TFNetworkStub
         return super().find_class(module, name)
